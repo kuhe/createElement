@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>document.createElement</title>
+    <meta name="description" content="document.createElement">
+    <meta name="keywords" content="document.createElement">
+
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          crossorigin="anonymous">
+
+</head>
+
+<body>
+
+</body>
+
+<script src="./createElement.global.js"></script>
+<script>
+
+    const div = nominate('div');
+    const li = nominate('li');
+    const ul = nominate('ul');
+    const form = nominate('form');
+    const input = nominate('input');
+
+    /**
+     *
+     * @implements Component
+     *
+     */
+    class Todo {
+
+        constructor() {
+
+            /**
+             * @type {string[]}
+             */
+            this.list = [
+                'add something to my todo list'
+            ];
+
+            /**
+             * @type {HTMLElement}
+             */
+            this.input = null;
+
+            /**
+             * @type {HTMLElement}
+             */
+            this.element = null;
+        }
+
+        /**
+         * Inline example of one return statement.
+         * @returns {HTMLElement}
+         */
+        templateInline() {
+
+            return this.element = div('', [
+                ul('', this.list.map(item => li('', item))),
+                form('', this.input = input('', null, {
+                    placeholder: 'Enter to submit'
+                }), {
+                    onsubmit: (e) => {
+                        e.preventDefault();
+                        this.list.push(this.input.value);
+                        this.input.value = '';
+                        render(this);
+                    }
+                })
+            ]);
+
+        }
+
+        /**
+         * Broken out into variables.
+         * @returns {HTMLElement}
+         */
+        template() {
+
+            this.input = input('', null, {
+                placeholder: 'Enter to submit'
+            });
+
+            const list_ = ul('', this.list.map(item => li('', item)));
+            const form_ = form('', this.input, {
+                onsubmit: (e) => {
+                    e.preventDefault();
+                    this.list.push(this.input.value);
+                    this.input.value = '';
+                    render(this);
+                }
+            });
+
+            this.element = div('', [
+                list_,
+                form_
+            ]);
+
+            return this.element;
+
+        }
+
+    }
+
+    document.body.appendChild(new Todo().template());
+
+</script>
+
+</html>
