@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/kuhe/createElement/issues"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "homepage": "https://github.com/kuhe/createElement#readme"
 }
