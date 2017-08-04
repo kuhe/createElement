@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           crossorigin="anonymous">
 
+    <link rel="stylesheet" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/3.5.0/mocha.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/3.5.0/mocha.min.js"></script>
+
 </head>
 
 <body>
@@ -58,7 +61,7 @@
          * Inline example of one return statement.
          * @returns {HTMLElement}
          */
-        templateInline() {
+        template() {
 
             return this.element = div('', [
                 ul('', this.list.map(item => li('', item))),
@@ -76,39 +79,220 @@
 
         }
 
-        /**
-         * Broken out into variables.
-         * @returns {HTMLElement}
-         */
-        template() {
-
-            this.input = input('', null, {
-                placeholder: 'Enter to submit'
-            });
-
-            const list_ = ul('', this.list.map(item => li('', item)));
-            const form_ = form('', this.input, {
-                onsubmit: (e) => {
-                    e.preventDefault();
-                    this.list.push(this.input.value);
-                    this.input.value = '';
-                    render(this);
-                }
-            });
-
-            this.element = div('', [
-                list_,
-                form_
-            ]);
-
-            return this.element;
-
-        }
-
     }
 
     document.body.appendChild(new Todo().template());
 
 </script>
+
+<div id="mocha"><p><a href=".">Index</a></p></div>
+<div id="messages"></div>
+<div id="fixtures"></div>
+<script>mocha.setup('bdd')</script>
+<script id="test_main">
+
+    const yes = (whatever, otherThing) => {
+        if (otherThing !== undefined) {
+            if (whatever !== otherThing) {
+                console.log(whatever, 'not', otherThing);
+                throw new Error(whatever, otherThing);
+            }
+        }
+        if (!whatever) throw new Error(whatever);
+    };
+
+    describe('nominal-create-element', () => {
+
+        describe('createElement', () => {
+            it("Let's make a <div>", () => {
+                const myDiv = createElement('div');
+                yes(myDiv instanceof HTMLDivElement);
+            });
+            it("It has class 'div-class'", () => {
+                const myDiv = createElement('div', 'div-class');
+                yes(myDiv.className, 'div-class');
+            });
+
+            describe('nested element creation', () => {
+
+                const div = nominate('div');
+                const span = nominate('span');
+
+                it(`Let's put some spans in it, like, a lot of spans`, () => {
+                    const el = div('' , [
+                        span('', 'Hello'),
+                        span('', 'World'),
+                        div('', [
+                            span('', 'Hello'),
+                            span('', [
+                                span('', 'Hello'),
+                                span('', [
+                                    span('', 'Hello'),
+                                    span('', 'World')
+                                ])
+                            ])
+                        ])
+                    ]);
+                    yes(el instanceof HTMLDivElement);
+                    yes(el.children[0] instanceof HTMLSpanElement);
+                    yes(el.children[1] instanceof HTMLSpanElement);
+                    yes(el.children[0].innerHTML, 'Hello');
+                    yes(el.children[1].innerHTML, 'World');
+                    yes(el.innerHTML, '<span class="">Hello</span><span class="">World</span><div class=""><span class="">Hello</span><span class=""><span class="">Hello</span><span class=""><span class="">Hello</span><span class="">World</span></span></span></div>');
+                });
+
+            });
+
+            describe('attribute specification', () => {
+
+                const div = nominate('div');
+                const span = nominate('span');
+
+                it('specify an id or a data-attribute, for example', () => {
+
+                    const el = div('', null, {
+                        id: 'div-id',
+                        'data-name': 'Test Driven Jones'
+                    });
+
+                    yes(el.getAttribute('id'), 'div-id');
+                    document.body.appendChild(el);
+                    yes(document.getElementById('div-id'), el);
+
+                });
+
+                it('you can bind events by prefixing `on` to an attribute', () => {
+
+                    let clicked = 0;
+
+                    const el = div('', null, {
+                        onclick: () => {
+                            ++clicked;
+                        }
+                    });
+
+                    let doClick = 10;
+                    while (doClick--) {
+                        el.click();
+                    }
+
+                    yes(clicked, 10);
+
+                });
+
+            });
+
+        });
+
+        describe('nominate', () => {
+
+            it(`Allows HTML shorthand`, () => {
+
+                const div = nominate('div');
+                const span = nominate('span');
+                const h1 = nominate('h1');
+                const h2 = nominate('h2');
+
+                const el = div('' , [
+                    h1('', span('', 'Hello')),
+                    h2('', 'World')
+                ]);
+
+                yes(el instanceof HTMLDivElement);
+                yes(el.children[0] instanceof HTMLHeadingElement);
+                yes(el.children[1] instanceof HTMLHeadingElement);
+                yes(el.children[0].children[0] instanceof HTMLSpanElement);
+                yes(el.children[1].innerHTML, 'World');
+
+            });
+
+        });
+
+        describe('render', () => {
+
+            const div = nominate('div');
+            const span = nominate('span');
+
+            it('You can use render to swap an element in place with a new version', () => {
+
+                const component = {
+                    element: span('span-class', 'Hello there'),
+                    template: function () { return this.element = div('div-class', 'Hello there'); }
+                };
+
+                document.body.appendChild(component.element);
+                yes(component.element instanceof HTMLSpanElement);
+                render(component);
+                yes(component.element instanceof HTMLDivElement);
+                render(component);
+                yes(component.element instanceof HTMLDivElement);
+
+            });
+
+            it('This is an in-place partial tree re-render, easy on the processor, probably :)', () => {
+
+                function getRandomColor() {
+                    const letters = '0123456789ABCDEF';
+                    let color = '#';
+                    for (let i = 0; i < 6; i++) {
+                        color += letters[Math.floor(Math.random() * 16)];
+                    }
+                    return color;
+                }
+
+                const makeBlock = function () {
+                    return div('', null, {
+                        style: `display: inline-block; height: 10px; width: 10px; background-color: ${getRandomColor()};`
+                    });
+                };
+
+                const grid = [1,2,3,4,5,6,7,8,9,0];
+
+                let times = 0;
+                let go = true;
+
+                const component = {
+                    element: null,
+                    template: function () {
+                        return this.element = div('checkerboard', [
+                            nominate('h6')('', 'This div was regenerated ' + times + ' times with random colors in 1 second'),
+                            nominate('h4')('', 'Warning: do not look directly at the HTMLElement'),
+                            grid.map(() => div('', grid.map(makeBlock)))
+                        ], {
+                            onclick: () => go = !go
+                        })
+                    }
+                };
+
+                document.body.appendChild(component.template());
+
+                const now = Date.now();
+
+                while (Date.now() - now < 1000) {
+
+                    render(component);
+                    times++;
+
+                }
+
+                let interval = 16;
+
+                setInterval(() => {
+                    if (go) {
+                        render(component)
+                    }
+                }, interval);
+
+            });
+
+            it('though I suppose browser optimization means that was not actually so many redraws', () => {
+                console.log('oh well');
+            });
+
+        });
+
+    });
+</script>
+<script>mocha.run();</script>
 
 </html>

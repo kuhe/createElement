@@ -2,32 +2,48 @@
 
 #### What?
 
-Forgive the unoriginal module name, but this JavaScript is a directive to use the browser native `document` interface,
+Forgive the unoriginal module name, but this JavaScript is here to encourage you to use the browser native `document` interface,
 rather than any attempt to brand itself.
 
-Two principles here:
+A few principles here:
 
 - (0) Save space, save bandwidth
 
-For writing out HTML with attached events, the DOM API should *not* be avoided in favor of frameworks or template DSLs.
+For writing out HTML with attached events, the DOM API is so full-featured
+there is no need for a template DLS or front end framework.
 
-It's zero-bandwidth, closer to fast native code, isn't as hard to write as you might expect, and you retain full
-control of where on your tree and how often you rerender.
+It's zero-bandwidth, closer to fast native code, isn't as hard to write as you might expect or have been told,
+ and you retain full control of where and how often you rerender your tree.
 
-- (1) No need for selectors
+- (1) There's no need for document query selectors
 
-Avoid the mistake of over or under-binding events by not using selectors. Bind events to elements created in memory,
-before they are attached to the document.
+Avoid the class of errors caused by over or under-binding events, the need to correlate class/id/tag, or waiting
+for your elements to appear on the document. Leave classNames for styling.
+
+Bind events to elements created in memory, before they are attached to the document.
+
+#### Related Information
+
+https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement
+
+https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
+
+http://youmightnotneedjquery.com/
+
 
 #### Import
 
 ```js
+// CJS module style
 const createElement = require('nominal-create-element');
 const render = createElement.render;
 const nominate = createElement.nominate;
 ```
 
-`import { createElement, nominate, render } from 'nominal-create-element';`
+```
+// ESM style
+import { createElement, nominate, render } from 'nominal-create-element/createElement.esm';
+```
 
 #### API
 
@@ -39,16 +55,16 @@ Although there is only one source file of 100 lines, here is the API:
  * @typedef {object} Component
  * @property {HTMLElement} element
  * @method {Function<HTMLElement>} template
+ *
+ * @example - this object implicitly implements the "Component" type.
+ * {
+ *    element: null,
+ *    template: () => this.element = createElement('div');
+ * }
  */
 
 /**
- * @interface Component
- * @property {HTMLElement} element
- * @method {Function<HTMLElement>} template
- */
-
-/**
- * Creates elements zzz.
+ * Unsurprisingly, creates elements with document.createElement.
  *
  * @function createElement
  * @param {string} tag - name of the element type.
@@ -60,7 +76,9 @@ Although there is only one source file of 100 lines, here is the API:
  */
 
 /**
- * Redraw in place.
+ * Redraw in place, by replacing the element with a new version of itself.
+ * Accepts any object matching the Component type, because its element is replaced in place (via its parent node)
+ * and the template method of the Component is used to generate the replacement.
  *
  * @function render
  * @param {Component} component
@@ -68,10 +86,11 @@ Although there is only one source file of 100 lines, here is the API:
 
 /**
  * Generate a binding of createElement for the given tag.
+ * This is used to give an HTML-like appearance to your document.createElement calls.
  *
  * @function nominate
  * @param {string} tag
- * @return {function}
+ * @return {function<HTMLElement>}
  */
 ```
 
@@ -83,6 +102,19 @@ Create an element with a `tag`, a css `class`, `body` and `attributes`.
 createElement('div', 'my-css-class', 'Hello, world', { id: 'my-div' });
 ```
 
+Nest elements (you see where I'm going).
+```js
+const div = nominate('div');
+const span = nominate('span');
+
+const element = div('', [
+
+    span('', 'Hello'),
+    span('', 'World')
+
+]);
+```
+
 Create a tree of elements. Attributes prefixed with `on` will be attached as events.
 
 ```js
@@ -91,13 +123,14 @@ const div = nominate('div');
 /**
  * @type {HTMLElement} append me somewhere.
  */
-const template = div('my-css', [
+const element = div('my-css-class', [
 
         div('', 'Hello'),
         div('', 'World')
 
     ], {
 
+    id: 'my-div-id'
     onclick: () => {
         console.log('clicked');
     }
@@ -108,96 +141,67 @@ const template = div('my-css', [
 
 A todo list example.
 
-Create a tree of elements. Attributes prefixed with `on` will be attached as events.
-
 ```js
-    const div = nominate('div');
-    const li = nominate('li');
-    const ul = nominate('ul');
-    const form = nominate('form');
-    const input = nominate('input');
+
+import { nominate, render } from 'nominal-create-element/createElement.esm';
+
+const div = nominate('div');
+const li = nominate('li');
+const ul = nominate('ul');
+const form = nominate('form');
+const input = nominate('input');
+
+/**
+ *
+ * @implements Component
+ *
+ */
+class Todo {
+
+    constructor() {
+
+        /**
+         * @type {string[]}
+         */
+        this.list = [
+            'add something to my todo list'
+        ];
+
+        /**
+         * @type {HTMLElement}
+         */
+        this.input = null;
+
+        /**
+         * @type {HTMLElement}
+         */
+        this.element = null;
+    }
 
     /**
-     *
-     * @implements Component
-     *
+     * @returns {HTMLElement}
      */
-    class Todo {
+    template() {
 
-        constructor() {
-
-            /**
-             * @type {string[]}
-             */
-            this.list = [
-                'add something to my todo list'
-            ];
-
-            /**
-             * @type {HTMLElement}
-             */
-            this.input = null;
-
-            /**
-             * @type {HTMLElement}
-             */
-            this.element = null;
-        }
-
-        /**
-         * Inline example of one return statement.
-         * @returns {HTMLElement}
-         */
-        templateInline() {
-
-            return this.element = div('', [
-                ul('', this.list.map(item => li('', item))),
-                form('', this.input = input('', null, {
-                    placeholder: 'Enter to submit'
-                }), {
-                    onsubmit: (e) => {
-                        e.preventDefault();
-                        this.list.push(this.input.value);
-                        this.input.value = '';
-                        render(this);
-                    }
-                })
-            ]);
-
-        }
-
-        /**
-         * Broken out into variables.
-         * @returns {HTMLElement}
-         */
-        template() {
-
-            this.input = input('', null, {
+        return this.element = div('', [
+            ul('', this.list.map(item => li('', item))),
+            form('', this.input = input('', null, {
                 placeholder: 'Enter to submit'
-            });
-
-            const list_ = ul('', this.list.map(item => li('', item)));
-            const form_ = form('', this.input, {
+            }), {
                 onsubmit: (e) => {
                     e.preventDefault();
                     this.list.push(this.input.value);
                     this.input.value = '';
                     render(this);
                 }
-            });
-
-            this.element = div('', [
-                list_,
-                form_
-            ]);
-
-            return this.element;
-
-        }
+            })
+        ]);
 
     }
 
-    document.body.appendChild(new Todo().template());
+}
+
+document.body.appendChild(new Todo().template());
 
 ```
 ### Test
