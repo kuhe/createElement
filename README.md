@@ -10,7 +10,7 @@ A few principles here:
 - (0) Save space, save bandwidth
 
 For writing out HTML with attached events, the DOM API is so full-featured
-there is no need for a template DLS or front end framework.
+there is no need for a template DSL or front end framework.
 
 It's zero-bandwidth, closer to fast native code, isn't as hard to write as you might expect or have been told,
  and you retain full control of where and how often you rerender your tree.
@@ -20,7 +20,9 @@ It's zero-bandwidth, closer to fast native code, isn't as hard to write as you m
 Avoid the class of errors caused by over or under-binding events, the need to correlate class/id/tag, or waiting
 for your elements to appear on the document. Leave classNames for styling.
 
-Bind events to elements created in memory, before they are attached to the document.
+Bind events to elements created in memory, before they are attached to the document. Write/append to the document
+when you are ready to give an interactive element to the user, not to query or store intermediate application states.
+
 
 #### Related Information
 
