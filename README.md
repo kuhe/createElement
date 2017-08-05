@@ -143,6 +143,36 @@ const element = div('my-css-class', [
 
 A todo list example.
 
+Below is where the `Component` interface should start to make sense. As a reminder:
+
+```js
+/**
+ * A "component" here is any object that has an element property and a template method.
+ * @typedef {object} Component
+ * @property {HTMLElement} element
+ * @method {Function<HTMLElement>} template
+ *
+ * @example - this object implicitly implements the "Component" type.
+ * {
+ *    element: null,
+ *    template: () => this.element = createElement('div');
+ * }
+ */
+ ```
+
+As long as you keep a reference (`element`) to your current element and a way to generate a new version of it (`template()`) from changes in your application state, _you_ control how often to re-render and where in your composed tree to do so.
+
+```js
+/**
+ * Redraw in place.
+ * @param {Component} component
+ */
+function render(component) {
+    var element = component.element;
+    element.parentNode.replaceChild(component.template(), element);
+}
+```
+
 ```js
 
 import { nominate, render } from 'nominal-create-element/createElement.esm';
