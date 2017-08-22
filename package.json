@@ -19,5 +19,15 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
-  "homepage": "https://github.com/kuhe/createElement#readme"
+  "homepage": "https://github.com/kuhe/createElement#readme",
+  "g5build": {
+    "uploadFiles": [
+      "demo.html",
+      "test.html",
+      "createElement.esm.js",
+      "createElement.global.js"
+    ],
+    "uploadFolders": [
+    ]
+  }
 }

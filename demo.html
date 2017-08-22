@@ -1,0 +1,149 @@
+
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>JS Document API demo</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <script src="createElement.global.js"></script>
+
+</head>
+<body>
+<!--[if lte IE 9]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<script>
+    window.div = nominate('div');
+    window.p = nominate('p');
+    window.section = nominate('section');
+    window.span = nominate('span');
+    window.a = nominate('a');
+    window.img = nominate('img');
+    window.h = n => nominate(`h${n}`);
+    window.main = nominate('main');
+    window.nav = nominate('nav');
+
+    window.label = nominate('label');
+    window.input = nominate('input');
+    window.form = nominate('form');
+    window.button = nominate('button');
+</script>
+
+<style>
+    textarea {
+        height: 700px;
+    }
+    .display {
+        height: 700px;
+        border: 1px dotted black;
+    }
+    main {
+        display: block;
+        height: 700px;
+    }
+</style>
+
+<main>
+
+<textarea id="test" class='col-xs-4'>
+
+// Try modifying the code?
+
+window.MyForm = class MyForm {
+
+    constructor() {
+        this.input = null;
+        this.msg = null;
+        this.element = null;
+    }
+
+    template() {
+
+        const onchange = this.validate.bind(this);
+        const onsubmit = this.submit.bind(this);
+
+        return this.element = main('section-css', [
+            h(2)('', 'A Form'),
+            form('', [
+                label('', 'My Label'),
+                this.msg = div('', 'Enter a greeting'),
+                this.input = input('', null, { type: 'text', onchange }),
+                button('', 'Go', { type: 'submit' })
+            ], { onsubmit })
+        ]);
+
+    }
+
+    validate() {
+        if (this.input.value === 'hello') {
+            this.msg.innerHTML = 'Good Day';
+        } else {
+            this.msg.innerHTML = 'please enter "hello"';
+        }
+    }
+
+    submit(e) {
+
+        e.preventDefault();
+        this.msg.innerHTML = 'You submitted the form with ' + this.input.value;
+
+    }
+
+}
+
+</textarea>
+
+    <div id='output_html' class='display col-xs-4'>
+
+    </div>
+
+    <pre id="output" class='display col-xs-4'>
+
+    </pre>
+
+    <script src="https://code.jquery.com/jquery-3.2.0.min.js" integrity="sha256-JAW99MJVpJBGcbzEuXk4Az05s/XyDdBomFqNlM3ic+I=" crossorigin="anonymous"></script>
+    <script>
+        const process = function (e) {
+            const val = $('#test').val();
+            let __main;
+            try {
+                eval(val);
+                $('#output_html')[0].appendChild(new window.MyForm().template());
+            } catch(e) {
+                console.error(e);
+                __main = e;
+                $('#output_html').html(__main);
+            }
+            const html = $('#output_html').html()
+                    .split('>').join('>\n')
+                    .split('<').join('\n<');
+            $('#output').text(html);
+        };
+        $('#test').change(process);
+        $('#test').keyup(process);
+        process();
+    </script>
+
+    <hr>
+</main>
+
+<pre class='col-xs-12'>
+    This isn't a framework, nor a template language. It is:
+        document.createElement
+        HTMLElement.addEventListener
+        HTMLElement.setAttribute
+        HTMLElement.replaceChild
+        HTMLElement.appendChild
+    and the rest of your pals in the window.document API.
+
+    <a href="./createElement.esm.js">Source</a>
+    <a href="./test.html">Automated Tests</a>
+</pre>
+
+</body>
+</html>
