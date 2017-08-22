@@ -113,6 +113,7 @@ window.MyForm = class MyForm {
             let __main;
             try {
                 eval(val);
+                $('#output_html').html('');
                 $('#output_html')[0].appendChild(new window.MyForm().template());
             } catch(e) {
                 console.error(e);
