@@ -26,7 +26,7 @@ function createElement(tag, class_, body, properties) {
 
     var element = document.createElement(tag);
 
-    element.className = class_;
+    element.className = class_ || '';
 
     var key;
     for (key in properties || {}) {

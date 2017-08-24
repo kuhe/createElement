@@ -27,7 +27,6 @@
       "createElement.esm.js",
       "createElement.global.js"
     ],
-    "uploadFolders": [
-    ]
+    "uploadFolders": []
   }
 }

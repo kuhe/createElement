@@ -18,120 +18,93 @@
 <![endif]-->
 
 <script>
-    window.div = nominate('div');
-    window.p = nominate('p');
-    window.section = nominate('section');
-    window.span = nominate('span');
-    window.a = nominate('a');
-    window.img = nominate('img');
     window.h = n => nominate(`h${n}`);
-    window.main = nominate('main');
-    window.nav = nominate('nav');
 
-    window.label = nominate('label');
-    window.input = nominate('input');
-    window.form = nominate('form');
-    window.button = nominate('button');
+    [
+        'div', 'p', 'section', 'span', 'a', 'img', 'main', 'nav',
+        'ul', 'li', 'ol',
+        'label', 'input', 'form', 'button'
+    ].forEach(tag => {
+        window[tag] = nominate(tag);
+    });
 </script>
 
 <style>
-    textarea {
-        height: 700px;
-    }
     .display {
         height: 700px;
         border: 1px dotted black;
     }
+    .display-a {
+        height: 250px;
+        border: 1px dotted black;
+    }
+    .display-b {
+        height: 200px;
+        border: 1px dotted black;
+    }
+    .display-c {
+        height: 400px;
+        border: 1px dotted black;
+    }
     main {
         display: block;
-        height: 700px;
+    }
+
+    .increment {
+        padding: 1rem;
+        font-weight: bold;
+        background: lightblue;
+        cursor: pointer;
     }
 </style>
 
 <main>
 
-<textarea id="test" class='col-xs-4'>
-
-// Try modifying the code?
-
-window.MyForm = class MyForm {
-
-    constructor() {
-        this.input = null;
-        this.msg = null;
-        this.element = null;
-    }
-
-    template() {
-
-        const onchange = this.validate.bind(this);
-        const onsubmit = this.submit.bind(this);
-
-        return this.element = main('section-css', [
-            h(2)('', 'A Form'),
-            form('', [
-                label('', 'My Label'),
-                this.msg = div('', 'Enter a greeting'),
-                this.input = input('', null, { type: 'text', onchange }),
-                button('', 'Go', { type: 'submit' })
-            ], { onsubmit })
-        ]);
-
-    }
-
-    validate() {
-        if (this.input.value === 'hello') {
-            this.msg.innerHTML = 'Good Day';
-        } else {
-            this.msg.innerHTML = 'please enter "hello"';
-        }
-    }
-
-    submit(e) {
-
-        e.preventDefault();
-        this.msg.innerHTML = 'You submitted the form with ' + this.input.value;
-
-    }
-
-}
-
-</textarea>
-
-    <div id='output_html' class='display col-xs-4'>
-
-    </div>
-
-    <pre id="output" class='display col-xs-4'>
-
-    </pre>
-
     <script src="https://code.jquery.com/jquery-3.2.0.min.js" integrity="sha256-JAW99MJVpJBGcbzEuXk4Az05s/XyDdBomFqNlM3ic+I=" crossorigin="anonymous"></script>
-    <script>
-        const process = function (e) {
-            const val = $('#test').val();
-            let __main;
-            try {
-                eval(val);
-                $('#output_html').html('');
-                $('#output_html')[0].appendChild(new window.MyForm().template());
-            } catch(e) {
-                console.error(e);
-                __main = e;
-                $('#output_html').html(__main);
-            }
-            const html = $('#output_html').html()
-                    .split('>').join('>\n')
-                    .split('<').join('\n<');
-            $('#output').text(html);
-        };
-        $('#test').change(process);
-        $('#test').keyup(process);
-        process();
+    <script defer>
+        $(() => {
+            ['', '-a', '-b', '-c'].forEach((v) => {
+
+                const $test = $('#test' + v),
+                        $output_html = $('#output_html' + v),
+                        $output = $('#output' + v);
+
+                const process = function (e) {
+
+                    const val = $test.val();
+                    let __main;
+                    try {
+                        eval('window[v || \'MyForm\'] = ' + val);
+                        $output_html.html('');
+                        $output_html[0].appendChild(new window[v || 'MyForm']().template());
+                    } catch(e) {
+                        console.error(e);
+                        __main = e;
+                        $output_html.html(__main);
+                    }
+                    const html = $output_html.html()
+                            .split('>').join('>\n')
+                            .split('<').join('\n<')
+                            .replace(/\n\n/g, '\n');
+
+                    $output.text(html);
+                };
+                $test
+                    .change(process)
+                    .keyup(process);
+                process();
+
+            });
+            window.MyCounter = window['-a'];
+        });
     </script>
 
     <hr>
 </main>
+
+<h2>
+    Skip the dependencies
+</h2>
 
 <pre class='col-xs-12'>
     This isn't a framework, nor a template language. It is:
@@ -145,6 +118,216 @@ window.MyForm = class MyForm {
     <a href="./createElement.esm.js">Source</a>
     <a href="./test.html">Automated Tests</a>
 </pre>
+
+<h4>Interactive Demos</h4>
+
+<div class="row">
+    <textarea id="test-a" class='display-a col-xs-4'>
+        // ex. A humble div element.
+        window.MyCounter = class {
+
+            template() {
+                const onclick = () => {
+                    this.count |= 0;
+                    this.count++;
+                    render(this);
+                };
+                return this.element
+                    = div('increment', "Increment Me: " + (this.count || 0), { onclick });
+            }
+
+        }
+    </textarea>
+
+    <div id='output_html-a' class='display-a col-xs-4'>
+
+    </div>
+
+    <pre id="output-a" class='display-a col-xs-4'>
+
+    </pre>
+</div>
+
+<div class="row">
+    <textarea id="test-b" class='display-b col-xs-4'>
+        // ex. Element composition
+        class AListOfCounters {
+            template() {
+                return this.element = ul(
+                    'list-none',
+                    [0, 1, 2].map(_ => new MyCounter().template())
+                );
+            }
+        }
+    </textarea>
+
+    <div id='output_html-b' class='display-b col-xs-4'>
+
+    </div>
+
+    <pre id="output-b" class='display-b col-xs-4'>
+
+    </pre>
+</div>
+
+<div class="row">
+    <textarea id="test-c" class='display-c col-xs-4'>
+        // ex. data and conditionals
+        class MyDataElement {
+            constructor(data) {
+                this.data = {
+                    greeting: 'hello, world',
+                    name: '' // try entering a name.
+                }
+            }
+            template() {
+                return this.element = div('', [
+                    h(1)('', 'Greetings'),
+                    (() => {
+                        const { name, greeting } = this.data;
+                        if (name) {
+                            return div('', `Hello, ${this.data.name}`);
+                        }
+                        return div('', greeting);
+                    })()
+                ]);
+            }
+        }
+    </textarea>
+
+    <div id='output_html-c' class='display-c col-xs-4'>
+
+    </div>
+
+    <pre id="output-c" class='display-c col-xs-4'>
+
+    </pre>
+</div>
+
+<div class="row">
+    <textarea id="test" class='col-xs-4 display'>
+
+        // Try modifying the code?
+
+        window.MyForm = class MyForm {
+
+            constructor() {
+                this.input = null;
+                this.msg = null;
+                this.element = null;
+            }
+
+            template() {
+
+                const onchange = this.validate.bind(this);
+                const onsubmit = this.submit.bind(this);
+
+                return this.element = main('section-css', [
+                    h(2)('', 'A Form'),
+                    form('', [
+                        label('', 'My Label'),
+                        this.msg = div('', 'Enter a greeting'),
+                        this.input = input('', null, { type: 'text', onchange }),
+                        button('', 'Go', { type: 'submit' })
+                    ], { onsubmit })
+                ]);
+
+            }
+
+            validate() {
+                if (this.input.value === 'hello') {
+                    this.msg.innerHTML = 'Good Day';
+                } else {
+                    this.msg.innerHTML = 'please enter "hello"';
+                }
+            }
+
+            submit(e) {
+
+                e.preventDefault();
+                this.msg.innerHTML = 'You submitted the form with ' + this.input.value;
+
+            }
+
+        }
+
+        </textarea>
+
+    <div id='output_html' class='display col-xs-4'>
+
+    </div>
+
+    <pre id="output" class='display col-xs-4'>
+
+    </pre>
+</div>
+
+<div class="col-xs-12">
+    <table class='table'>
+        <thead>
+        <tr>
+            <th>Handlebars</th>
+            <th>JavaScript</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th>____</th><th>____</th>
+        </tr>
+        <tr>
+            <th>Interpolation</th><th>`template String`</th>
+        </tr>
+        <tr>
+            <th>Block Expressions</th><th>Closures</th>
+        </tr>
+        <tr>
+            <th>#each</th><th>Array</th>
+        </tr>
+        <tr>
+            <th>#if</th><th>if</th>
+        </tr>
+        <tr>
+            <th>Partials</th><th>Functions & composition</th>
+        </tr>
+        <tr>
+            <th>Helpers</th><th>Function</th>
+        </tr>
+        <tr>
+            <th>Data paths ../../where/is/my/data</th><th>Interact with your data objects directly</th>
+        </tr>
+        <tr>
+            <th>Runs on the server</th><th>npm install jsdom</th>
+        </tr>
+        <tr>
+            <th>Client runtime + compiled JS larger than your original HTML</th><th>Free in browsers</th>
+        </tr>
+        <tr>
+            <th>Must use selectors to bind events</th><th>Bind events before touching the document</th>
+        </tr>
+        <tr>
+            <th>Template comments</th><th> /** Amazing */ </th>
+        </tr>
+        <tr>
+            <th>____</th><th>____</th>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class='row'>
+    <pre class='display-b col-xs-12'>
+        // Where did the tag shorthand come from?
+        // @see <a href="./createElement.esm.js">Source</a>
+        window.h = n => nominate(`h${n}`);
+        [
+            'div', 'p', 'section', 'span', 'a', 'img', 'main', 'nav',
+            'ul', 'li', 'ol',
+            'label', 'input', 'form', 'button'
+        ].forEach(tag => {
+            window[tag] = nominate(tag);
+        });
+    </pre>
+</div>
 
 </body>
 </html>

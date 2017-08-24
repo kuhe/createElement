@@ -33,7 +33,7 @@ define('nominal-create-element', function (require, exports, module) {
 
         var element = document.createElement(tag);
 
-        element.className = class_;
+        element.className = class_ || '';
 
         var key;
         for (key in properties || {}) {
