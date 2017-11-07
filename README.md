@@ -235,18 +235,18 @@ class Todo {
      */
     template() {
 
-        return this.element = div('', [
-            ul('', this.list.map(item => li('', item))),
-            form('', this.input = input('', null, {
+        return this.element = div({}, [
+            ul({}, this.list.map(item => li('', item))),
+            form({
+                 onsubmit: (e) => {
+                     e.preventDefault();
+                     this.list.push(this.input.value);
+                     this.input.value = '';
+                     render(this);
+                 }
+             }, this.input = input('', null, {
                 placeholder: 'Enter to submit'
-            }), {
-                onsubmit: (e) => {
-                    e.preventDefault();
-                    this.list.push(this.input.value);
-                    this.input.value = '';
-                    render(this);
-                }
-            })
+            }))
         ]);
 
     }
