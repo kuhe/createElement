@@ -7,7 +7,7 @@ rather than any attempt to brand itself.
 
 A few principles here:
 
-- (0) Save space, save bandwidth
+- (0) Save space, save bandwidth, save parse time.
 
 For writing out HTML with attached events, the DOM API is so full-featured
 there is no need for a template DSL or front end framework.
@@ -17,10 +17,10 @@ It's zero-bandwidth, closer to fast native code, isn't as hard to write as you m
 
 - (1) There's no need for document query selectors
 
-Avoid the class of errors caused by over or under-binding events, the need to correlate class/id/tag, or waiting
+Avoid the class of errors caused by over or under-binding events, the need to match class/id/tag, or waiting
 for your elements to appear on the document. Leave classNames for styling.
 
-Bind events to elements created in memory, before they are attached to the document. Write/append to the document
+Bind events to elements created in memory, before they are attached to the document. Attach/append to the document
 when you are ready to give an interactive element to the user, not to query or store intermediate application states.
 
 
@@ -53,7 +53,7 @@ Although there is only one source file of 100 lines, here is the API:
 
 ```js
 /**
- * A "component" here is any object that has an element property and a template method.
+ * A "component" here is any object that has an [element] property and a [template()] method.
  * @typedef {object} Component
  * @property {HTMLElement} element
  * @method {Function<HTMLElement>} template
@@ -75,6 +75,10 @@ Although there is only one source file of 100 lines, here is the API:
  * @param {object} [properties] - map of attributes.
  * @returns {HTMLElement}
  *
+ * Alternate signature:
+ *     createElement(tag, properties, body)
+ *
+ * Where [class_] is expressed as 'class' or 'className' of [properties].
  */
 
 /**
@@ -102,6 +106,22 @@ Create an element with a `tag`, a css `class`, `body` and `attributes`.
 
 ```js
 createElement('div', 'my-css-class', 'Hello, world', { id: 'my-div' });
+
+// or
+
+createElement('div', { id: 'my-div', class: 'my-css-class' }, 'Hello, world');
+```
+
+Via "nomination", hence the name of the module:
+
+```js
+
+const div = nominate('div');
+
+div({ id: 'my-div' }, 'Hello, world');
+
+div({}, 'Hello, world'); // no attributes.
+
 ```
 
 Nest elements (you see where I'm going).

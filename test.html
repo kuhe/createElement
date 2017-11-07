@@ -254,13 +254,14 @@
                 const component = {
                     element: null,
                     template: function () {
-                        return this.element = div('checkerboard', [
+                        return this.element = div({
+                            onclick: () => go = !go,
+                            className: 'checkerboard'
+                        }, [
                             nominate('h6')('', 'This div was regenerated ' + times + ' times with random colors in 1 second'),
                             nominate('h4')('', 'Warning: do not look directly at the HTMLElement'),
                             grid.map(() => div('', grid.map(makeBlock)))
-                        ], {
-                            onclick: () => go = !go
-                        })
+                        ])
                     }
                 };
 

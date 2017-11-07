@@ -28,8 +28,16 @@ define('nominal-create-element', function (require, exports, module) {
      * @param {object} [properties] - map of attributes.
      * @returns {HTMLElement}
      *
+     * Alternate signature:
+     *  createElement(tag, properties, body)
+     *
      */
     function createElement(tag, class_, body, properties) {
+
+        if (typeof class_ === 'object') {
+            properties = class_;
+            class_ = properties.class || properties.className || '';
+        }
 
         var element = document.createElement(tag);
 
