@@ -2,7 +2,7 @@
 
 #### What?
 
-Forgive the unoriginal module name, but this JavaScript is here to encourage you to use the browser native `document` interface,
+Forgive the unoriginal module name, but this 'script is here to encourage you to use the browser native `document` interface,
 rather than any attempt to brand itself.
 
 A few principles here:
@@ -15,7 +15,7 @@ there is no need for a template DSL or front end framework.
 It's zero-bandwidth, closer to fast native code, isn't as hard to write as you might expect or have been told,
  and you retain full control of where and how often you rerender your tree.
 
-- (1) There's no need for document query selectors
+- (1) There's no need for document query selectors.
 
 Avoid the class of errors caused by over or under-binding events, the need to match class/id/tag, or waiting
 for your elements to appear on the document. Leave classNames for styling.
@@ -43,7 +43,7 @@ const nominate = createElement.nominate;
 ```
 
 ```
-// ESM style
+// ESM style, also available in TypeScript
 import { createElement, nominate, render } from 'nominal-create-element/createElement.esm';
 ```
 
@@ -51,147 +51,78 @@ import { createElement, nominate, render } from 'nominal-create-element/createEl
 
 Although there is only one source file of 100 lines, here is the API:
 
-```js
-/**
- * A "component" here is any object that has an [element] property and a [template()] method.
- * @typedef {object} Component
- * @property {HTMLElement} element
- * @method {Function<HTMLElement>} template
- *
- * @example - this object implicitly implements the "Component" type.
- * {
- *    element: null,
- *    template: () => this.element = createElement('div');
- * }
- */
-
-/**
- * Unsurprisingly, creates elements with document.createElement.
- *
- * @function createElement
- * @param {string} tag - name of the element type.
- * @param {string} [class_] - css class name.
- * @param {string|HTMLElement|HTMLElement[]} [body] - string elements to form the body.
- * @param {object} [properties] - map of attributes.
- * @returns {HTMLElement}
- *
- * Alternate signature:
- *     createElement(tag, properties, body)
- *
- * Where [class_] is expressed as 'class' or 'className' of [properties].
- */
-
-/**
- * Redraw in place, by replacing the element with a new version of itself.
- * Accepts any object matching the Component type, because its element is replaced in place (via its parent node)
- * and the template method of the Component is used to generate the replacement.
- *
- * @function render
- * @param {Component} component
- */
-
-/**
- * Generate a binding of createElement for the given tag.
- * This is used to give an HTML-like appearance to your document.createElement calls.
- *
- * @function nominate
- * @param {string} tag
- * @return {function<HTMLElement>}
- */
+```ts
+function createElement(tag: string, ...body: body_t[]): HTMLElement;
+function createElement(tag: string, className: string, ...body: body_t[]): HTMLElement;
+function createElement(tag: string, attributes: { [key: string]: any|(() => void) }, ...body: body_t[]): HTMLElement;
 ```
 
-#### examples
+You'll mostly use a partial binding of the `createElement` function with the tag already provided, via the
+`nominate(string)` function.
 
-Create an element with a `tag`, a css `class`, `body` and `attributes`.
-
-```js
-createElement('div', 'my-css-class', 'Hello, world', { id: 'my-div' });
-
-// or
-
-createElement('div', { id: 'my-div', class: 'my-css-class' }, 'Hello, world');
+```ts
+type nominal_creator_t = {
+    (...body: body_t[]): HTMLElement;
+    (className: string, ...body: body_t[]): HTMLElement;
+    (attributes: { [key: string]: any|(() => void) }, ...body: body_t[]): HTMLElement;
+};
+function nominate(tag: string): nominal_creator_t;
 ```
 
-Via "nomination", hence the name of the module:
+You can use the provided `render` function if you adhere to a certain component interface.
 
-```js
-
-const div = nominate('div');
-
-div({ id: 'my-div' }, 'Hello, world');
-
-div({}, 'Hello, world'); // no attributes.
-
-```
-
-Nest elements (you see where I'm going).
-```js
-const div = nominate('div');
-const span = nominate('span');
-
-const element = div('', [
-
-    span('', 'Hello'),
-    span('', 'World')
-
-]);
-```
-
-Create a tree of elements. Attributes prefixed with `on` will be attached as events.
-
-```js
-const div = nominate('div');
-
-/**
- * @type {HTMLElement} append me somewhere.
- */
-const element = div('my-css-class', [
-
-        div('', 'Hello'),
-        div('', 'World')
-
-    ], {
-
-    id: 'my-div-id'
-    onclick: () => {
-        console.log('clicked');
-    }
-
-});
-
-```
-
-A todo list example.
-
-Below is where the `Component` interface should start to make sense. As a reminder:
-
-```js
-/**
- * A "component" here is any object that has an element property and a template method.
- * @typedef {object} Component
- * @property {HTMLElement} element
- * @method {Function<HTMLElement>} template
- *
- * @example - this object implicitly implements the "Component" type.
- * {
- *    element: null,
- *    template: () => this.element = createElement('div');
- * }
- */
- ```
-
-As long as you keep a reference (`element`) to your current element and a way to generate a new version of it (`template()`) from changes in your application state, _you_ control how often to re-render and where in your composed tree to do so.
-
-```js
-/**
- * Redraw in place.
- * @param {Component} component
- */
-function render(component) {
+```ts
+type component_t = {
+    element: HTMLElement;
+    template(): HTMLElement;
+}
+function render(component: component_t): void {
     var element = component.element;
     element.parentNode.replaceChild(component.template(), element);
 }
 ```
+
+#### examples
+
+```js
+const div = nominate('div');
+const span = nominate('span');
+```
+
+Create a simple element.
+
+```js
+div(); // HTMLDivElement
+```
+
+Create an element with a css `class`.
+
+```js
+div('my-css-class');
+```
+
+Create an element with a css `class`, some body text and additional `attributes`.
+
+```js
+div({ id: 'my-css-id', class: 'my-css-class' }, 'my body text');
+```
+
+```js
+div({}, 'Hello, world'); // no attributes.
+
+```
+
+Nest elements
+```js
+div(
+    span('a', 'Hello'),
+    span('b', 'World')
+);
+```
+
+And further on, something with more complexity:
+
+A todo list example.
 
 ```js
 
@@ -205,13 +136,12 @@ const input = nominate('input');
 
 /**
  *
- * @implements Component
+ * @implements component_t
  *
  */
 class Todo {
 
     constructor() {
-
         /**
          * @type {string[]}
          */
@@ -235,19 +165,29 @@ class Todo {
      */
     template() {
 
-        return this.element = div('', [
-            ul('', this.list.map(item => li('', item))),
-            form('', this.input = input('', null, {
-                placeholder: 'Enter to submit'
-            }), {
-                onsubmit: (e) => {
-                    e.preventDefault();
-                    this.list.push(this.input.value);
-                    this.input.value = '';
-                    render(this);
-                }
-            })
-        ]);
+        // This is equivalent to the following HTML:
+        //<div>
+        //    <ul>
+        //        <li>add something to my todo list</li>
+        //    </ul>
+        //    <form>
+        //        <input placeholder="Etner to submit">
+        //    </form>
+        //</div>
+
+        return this.element =
+            div(
+                ul(this.list.map(item => li('', item))),
+                form(this.input = input({
+                    placeholder: 'Enter to submit',
+                    submit: (e) => {
+                        e.preventDefault();
+                        this.list.push(this.input.value);
+                        this.input.value = '';
+                        render(this);
+                    }
+                })
+            );
 
     }
 

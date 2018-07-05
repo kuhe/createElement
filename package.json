@@ -1,6 +1,6 @@
 {
   "name": "nominal-create-element",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "",
   "main": "createElement.cjs.js",
   "module": "createElement.esm.js",
@@ -19,14 +19,5 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
-  "homepage": "https://github.com/kuhe/createElement#readme",
-  "g5build": {
-    "uploadFiles": [
-      "demo.html",
-      "test.html",
-      "createElement.esm.js",
-      "createElement.global.js"
-    ],
-    "uploadFolders": []
-  }
+  "homepage": "https://github.com/kuhe/createElement#readme"
 }

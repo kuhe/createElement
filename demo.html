@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>JS Document API demo</title>
-    <meta name="description" content="">
+    <meta name="description" content="JS Document API demo">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
@@ -13,9 +13,6 @@
 
 </head>
 <body>
-<!--[if lte IE 9]>
-<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-<![endif]-->
 
 <script>
     window.h = n => nominate(`h${n}`);
@@ -125,15 +122,15 @@
     <textarea id="test-a" class='display-a col-xs-4'>
         // ex. A humble div element.
         window.MyCounter = class {
-
             template() {
-                const onclick = () => {
+                const click = () => {
                     this.count |= 0;
                     this.count++;
                     render(this);
                 };
-                return this.element
-                    = div('increment', "Increment Me: " + (this.count || 0), { onclick });
+                return this.element = div(
+                    { class: 'increment', click }, "Increment Me: " + (this.count || 0)
+                );
             }
 
         }
@@ -181,7 +178,7 @@
                 }
             }
             template() {
-                return this.element = div('', [
+                return this.element = div(
                     h(1)('', 'Greetings'),
                     (() => {
                         const { name, greeting } = this.data;
@@ -190,7 +187,7 @@
                         }
                         return div('', greeting);
                     })()
-                ]);
+                );
             }
         }
     </textarea>
@@ -207,8 +204,6 @@
 <div class="row">
     <textarea id="test" class='col-xs-4 display'>
 
-        // Try modifying the code?
-
         window.MyForm = class MyForm {
 
             constructor() {
@@ -219,18 +214,18 @@
 
             template() {
 
-                const onchange = this.validate.bind(this);
-                const onsubmit = this.submit.bind(this);
+                const change = this.validate.bind(this);
+                const submit = this.submit.bind(this);
 
-                return this.element = main('section-css', [
-                    h(2)('', 'A Form'),
-                    form('', [
+                return this.element = main('section-css',
+                    h(2)('header2', 'A Form'),
+                    form({ submit },
                         label('', 'My Label'),
-                        this.msg = div('', 'Enter a greeting'),
-                        this.input = input('', null, { type: 'text', onchange }),
-                        button('', 'Go', { type: 'submit' })
-                    ], { onsubmit })
-                ]);
+                        this.input = input({ type: 'text', change, keyup: change }),
+                        button({ type: 'submit', class: 'go-button' }, 'Go')
+                    ),
+                    this.msg = div('message', 'Enter a greeting'),
+                );
 
             }
 
@@ -238,7 +233,7 @@
                 if (this.input.value === 'hello') {
                     this.msg.innerHTML = 'Good Day';
                 } else {
-                    this.msg.innerHTML = 'please enter "hello"';
+                    this.msg.innerHTML = 'please enter "hello", you entered ' + this.input.value;
                 }
             }
 
@@ -260,61 +255,6 @@
     <pre id="output" class='display col-xs-4'>
 
     </pre>
-</div>
-
-<div class="col-xs-12">
-    <table class='table'>
-        <thead>
-        <tr>
-            <th>Handlebars</th>
-            <th>JavaScript</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <th>____</th><th>____</th>
-        </tr>
-        <tr>
-            <th>Interpolation</th><th>`template String`</th>
-        </tr>
-        <tr>
-            <th>Block Expressions</th><th>Closures</th>
-        </tr>
-        <tr>
-            <th>#each</th><th>Array</th>
-        </tr>
-        <tr>
-            <th>#if</th><th>if</th>
-        </tr>
-        <tr>
-            <th>Partials</th><th>Functions & composition</th>
-        </tr>
-        <tr>
-            <th>Helpers</th><th>Function</th>
-        </tr>
-        <tr>
-            <th>Data paths ../../where/is/my/data</th><th>Interact with your data objects directly</th>
-        </tr>
-        <tr>
-            <th>Runs on the server</th><th>npm install jsdom</th>
-        </tr>
-        <tr>
-            <th>Client runtime + compiled JS larger than your original HTML</th><th>Free in browsers</th>
-        </tr>
-        <tr>
-            <th>Write 12 lines of html, get 120 lines of JS (try the compiler)</th><th>Write 12 lines of JS</th>
-        </tr>
-        <tr>
-            <th>Must use selectors to bind events</th><th>Bind events before touching the document</th>
-        </tr>
-        <tr>
-            <th>Template comments</th><th> /** Amazing */ </th>
-        </tr>
-        <tr>
-            <th>____</th><th>____</th>
-        </tr>
-        </tbody>
-    </table>
 </div>
 
 <div class='row'>

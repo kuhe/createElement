@@ -1,68 +1,102 @@
 /**
- * A "component" here is any object that has an element property and a template method.
- * @typedef {object} Component
- * @property {HTMLElement} element
+ * A "component" here is any object that has an element property and a render method.
+ * The render method should provide an HTMLElement which is assigned to the element property.
+ *
+ * The main reason being that the #render(component_t) function also provided here uses both fields
+ * to perform a swap in the DOM tree node.
+ *
+ * @typedef {object} component_t
+ * @property {HTMLElement|null} element
  * @method {Function<HTMLElement>} template
  */
 
-/**
- * @interface Component
- * @property {HTMLElement} element
- * @method {Function<HTMLElement>} template
- */
 
 /**
  *
  * Creates elements zzz.
  *
  * @param {string} tag - name of the element type.
- * @param {string} [class_] - css class name.
- * @param {string|HTMLElement|HTMLElement[]} [body] - string elements to form the body.
- * @param {object} [properties] - map of attributes.
+ * @example div
+ *      createElement('div'); // equivalent to document.createElement('div');
+ *
+ * @param {string} [classNameOrAttributes=''] - css class name or an object of attributes.
+ * @example class
+ *      createElement('div', 'my-css-class');
+ * @example attributes
+ *      createElement('div', {
+ *          click: function (event) {}; // event listeners use their event name as key.
+ *          id: 'my-css-id',
+ *          role: 'button'
+ *      });
+ *
+ *
+ * @param {string|HTMLElement|HTMLElement[]} [body] - string or elements to form the body.
+ *        This is a rest parameter, and you may provide any of the following:
+ *
+ * @example one string
+ *      createElement('div', {}, 'body content string');
+ *
+ * @example one or more HTMLElements or nested arrays thereof
+ *
+ *      createElement('div', {},
+ *          div(), div(), null, div(), [div(), div(), [div(), div()]]
+ *      );
+ *      // the nested elements will all be normalized to a flat array of child nodes,
+ *      // and falsy values will be ignored.
+ *
  * @returns {HTMLElement}
  *
- * Alternate signature:
- *  createElement(tag, properties, body)
- *
  */
-function createElement(tag, class_, body, properties) {
+function createElement(tag, classNameOrAttributes/*, ...body*/) {
 
-    if (typeof class_ === 'object') {
-        properties = class_;
-        class_ = properties.class || properties.className || '';
+    var i = 2;
+    var _c = classNameOrAttributes;
+    var props;
+    var className = _c || '';
+    _c = _c || '';
+    if (typeof _c === 'object') {
+        if ('innerHTML' in _c || 'length' in _c) {
+            --i;
+            className = '';
+        } else {
+            props = _c;
+            className = props.class || props.className || '';
+            delete props.class;
+            delete props.className;
+        }
     }
 
-    var element = document.createElement(tag);
+    var el = document.createElement(tag);
 
-    element.className = class_ || '';
+    if (className) el.className = className;
 
-    var key;
-    for (key in properties || {}) {
-        var value = properties[key];
-        if (key.slice(0, 2) === 'on') {
-            element.addEventListener(key.slice(2), value);
+    for (var k in props || {}) {
+        var v = props[k];
+        if (typeof v === 'function') {
+            el.addEventListener(k, v);
             continue;
         }
-        element.setAttribute(key, value);
+        el.setAttribute(k, v);
     }
 
-    if (typeof body in { string: true, number: true }) { // primitives.
-        element.innerHTML = body;
-    } else if (body) { // arrays of things or HTMLElement.
-        var children = flatten(body);
-        for (var i = 0; i < children.length; ++i) {
-            var child = children[i];
-            element.appendChild(child);
+    if (typeof arguments[i] in { string: 0, number: 0 }) {
+        el.innerHTML = arguments[i];
+    } else {
+        for (; i < arguments.length; ++i) {
+            var children = flatten(arguments[i]);
+            for (var j = 0; j < children.length; ++j) {
+                el.appendChild(children[j]);
+            }
         }
     }
 
-    return element;
+    return el;
 
 }
 
 /**
  * Redraw in place.
- * @param {Component} component
+ * @param {component_t} component
  */
 function render(component) {
     var element = component.element;
@@ -71,34 +105,55 @@ function render(component) {
 
 /**
  * @private
- * @param {*} array - possibly nested array.
+ * @param {*} arr - possibly nested array.
  * @returns {*[]}
  */
-function flatten(array) {
+function flatten(arr) {
 
-    if (!(array instanceof Array)) {
-        return [array];
+    if (
+        typeof arr !== 'object' ||
+        !('length' in arr) ||
+        ('innerHTML' in arr)
+    ) {
+        if (arr) {
+            return [arr];
+        }
+        return [];
     }
 
     var out = [];
 
     var i = 0;
-    for (; i < array.length; ++i) {
-        var item = array[i];
-        if (item instanceof Array) {
+    for (; i < arr.length; ++i) {
+        var item = arr[i];
+        if (
+            (typeof item === 'object') &&
+            ('length' in item) &&
+            !('innerHTML' in item)
+        ) {
             Array.prototype.push.apply(out, flatten(item));
-        } else {
+        } else if (item) {
             out.push(item);
         }
     }
 
     return out;
+
 }
 
 /**
+ * This creates a binding of createElement for a particular tag name.
+ * @example
+ *  var div = nominate('div');
+ *  var span = nominate('span');
+ *  div(
+ *    span()
+ *  ) // returns an HTMLDivElement containing a span.
+ *
+ * @public
  * @param {string} tag
- * @return {function} binding of createElement for the given tag.
+ * @return {function<HTMLElement>}
  */
-var nominate = function (tag) {
+function nominate(tag) {
     return createElement.bind(null, tag);
-};
+}

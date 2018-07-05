@@ -19,8 +19,6 @@
 
 <body>
 
-</body>
-
 <script src="./createElement.global.js"></script>
 <script>
 
@@ -29,16 +27,17 @@
     const ul = nominate('ul');
     const form = nominate('form');
     const input = nominate('input');
+    const h = n => nominate('h' + n);
+    const button = nominate('button');
 
     /**
      *
-     * @implements Component
+     * @implements component_t
      *
      */
     class Todo {
 
         constructor() {
-
             /**
              * @type {string[]}
              */
@@ -46,42 +45,59 @@
                 'add something to my todo list'
             ];
 
-            /**
-             * @type {HTMLElement}
-             */
+            /** @type {HTMLElement} */
+            this.form = null;
+
+            /** @type {HTMLElement} */
             this.input = null;
 
-            /**
-             * @type {HTMLElement}
-             */
+            /** @type {HTMLElement} */
             this.element = null;
+
         }
 
         /**
-         * Inline example of one return statement.
          * @returns {HTMLElement}
          */
         template() {
 
-            return this.element = div('', [
-                ul('', this.list.map(item => li('', item))),
-                form('', this.input = input('', null, {
-                    placeholder: 'Enter to submit'
-                }), {
-                    onsubmit: (e) => {
-                        e.preventDefault();
-                        this.list.push(this.input.value);
-                        this.input.value = '';
-                        render(this);
-                    }
-                })
-            ]);
+            // This is equivalent to the following HTML:
+            //<div>
+            //    <ul>
+            //        <li>add something to my todo list</li>
+            //    </ul>
+            //    <form>
+            //        <input placeholder="Enter to submit">
+            //    </form>
+            //</div>
+
+            return this.element =
+                div(
+                    { style: 'margin: 25px; padding: 15px;' },
+                    h(5)('', 'To Do List'),
+                    ul(this.list.map(item => li('', item))),
+                    this.form = form(
+                        {
+                            submit: (e) => {
+                                e.preventDefault();
+                                this.list.push(this.input.value);
+                                this.input.value = '';
+                                render(this);
+                            }
+                        },
+                        this.input = input({
+                            placeholder: 'Enter to submit'
+                        }),
+                        button({ type: 'submit' }, 'Add')
+                    )
+                );
 
         }
 
     }
 
-    document.body.appendChild(new Todo().template());
+    var todo = new Todo();
+    document.body.appendChild(todo.template());
 
 </script>
 
@@ -119,26 +135,26 @@
                 const span = nominate('span');
 
                 it(`Let's put some spans in it, like, a lot of spans`, () => {
-                    const el = div('' , [
+                    const el = div(
                         span('', 'Hello'),
                         span('', 'World'),
-                        div('', [
+                        div(
                             span('', 'Hello'),
-                            span('', [
+                            span(
                                 span('', 'Hello'),
-                                span('', [
+                                span(
                                     span('', 'Hello'),
                                     span('', 'World')
-                                ])
-                            ])
-                        ])
-                    ]);
+                                )
+                            )
+                        )
+                    );
                     yes(el instanceof HTMLDivElement);
                     yes(el.children[0] instanceof HTMLSpanElement);
                     yes(el.children[1] instanceof HTMLSpanElement);
                     yes(el.children[0].innerHTML, 'Hello');
                     yes(el.children[1].innerHTML, 'World');
-                    yes(el.innerHTML, '<span class="">Hello</span><span class="">World</span><div class=""><span class="">Hello</span><span class=""><span class="">Hello</span><span class=""><span class="">Hello</span><span class="">World</span></span></span></div>');
+                    yes(el.innerHTML, '<span>Hello</span><span>World</span><div><span>Hello</span><span><span>Hello</span><span><span>Hello</span><span>World</span></span></span></div>');
                 });
 
             });
@@ -150,7 +166,7 @@
 
                 it('specify an id or a data-attribute, for example', () => {
 
-                    const el = div('', null, {
+                    const el = div({
                         id: 'div-id',
                         'data-name': 'Test Driven Jones'
                     });
@@ -161,12 +177,12 @@
 
                 });
 
-                it('you can bind events by prefixing `on` to an attribute', () => {
+                it('you can bind events', () => {
 
                     let clicked = 0;
 
-                    const el = div('', null, {
-                        onclick: () => {
+                    const el = div({
+                        click: () => {
                             ++clicked;
                         }
                     });
@@ -178,6 +194,102 @@
 
                     yes(clicked, 10);
 
+                });
+
+            });
+
+            describe('alternate syntaxes and call signatures', () => {
+
+                const div = nominate('div');
+
+                it('div()', () => {
+                    const el = div();
+                    yes(el instanceof HTMLDivElement);
+                });
+
+                it('div("class")', () => {
+                    const el = div("class");
+                    yes(el instanceof HTMLDivElement);
+                    yes(el.classList.contains('class'));
+                });
+
+                it('div({ id: "id" })', () => {
+                    const el = div({ id: "id" });
+                    yes(el instanceof HTMLDivElement);
+                    yes(el.id === 'id');
+                });
+
+                it('div(div())', () => {
+                    const el = div(div());
+                    yes(el instanceof HTMLDivElement);
+                    yes(el.childNodes[0] instanceof HTMLDivElement);
+                });
+
+                it('div("class", div())', () => {
+                    const el = div("class", div());
+                    yes(el instanceof HTMLDivElement);
+                    yes(el.classList.contains('class'));
+                    yes(el.childNodes[0] instanceof HTMLDivElement);
+                });
+
+                it('div({ id: "id" }, div())', () => {
+                    const el = div({ id: "id" }, div());
+                    yes(el instanceof HTMLDivElement);
+                    yes(el.id === 'id');
+                    yes(el.childNodes[0] instanceof HTMLDivElement);
+                });
+
+                it('div(div(), div(), [div(), [div(), div()]])', () => {
+                    const el = div(div(), div(), [div(), [div(), div()]]);
+                    yes(el instanceof HTMLDivElement);
+                    yes(el.childNodes[0] instanceof HTMLDivElement);
+                    yes(el.childNodes[1] instanceof HTMLDivElement);
+                    yes(el.childNodes[2] instanceof HTMLDivElement);
+                    yes(el.childNodes[3] instanceof HTMLDivElement);
+                    yes(el.childNodes[4] instanceof HTMLDivElement);
+                });
+
+                it('div("class", div(), div(), [div(), [div(), div()]])', () => {
+                    const el = div("class", div(), div(), [div(), [div(), div()]]);
+                    yes(el instanceof HTMLDivElement);
+                    yes(el.classList.contains('class'));
+                    yes(el.childNodes[0] instanceof HTMLDivElement);
+                    yes(el.childNodes[1] instanceof HTMLDivElement);
+                    yes(el.childNodes[2] instanceof HTMLDivElement);
+                    yes(el.childNodes[3] instanceof HTMLDivElement);
+                    yes(el.childNodes[4] instanceof HTMLDivElement);
+                });
+
+                it('div({ id: "id" }, div(), div(), [div(), [div(), div()]])', () => {
+                    const el = div({ id: "id" }, div(), div(), [div(), [div(), div()]]);
+                    yes(el instanceof HTMLDivElement);
+                    yes(el.id === 'id');
+                    yes(el.childNodes[0] instanceof HTMLDivElement);
+                    yes(el.childNodes[1] instanceof HTMLDivElement);
+                    yes(el.childNodes[2] instanceof HTMLDivElement);
+                    yes(el.childNodes[3] instanceof HTMLDivElement);
+                    yes(el.childNodes[4] instanceof HTMLDivElement);
+                });
+
+                it('complex template', () => {
+                    const strong = nominate('strong');
+                    const em = nominate('em');
+                    const section = nominate('section');
+                    const span = nominate('span');
+                    const el = div(
+                        ul([li(), li(strong())]),
+                        div(),
+                        0,
+                        section('class',
+                            span('', 'hello'),
+                            0,
+                            div(),
+                            em({ id: 'id' }, 'world')
+                        )
+                    );
+                    console.log(el.innerHTML);
+                    yes(el.innerHTML ===
+                        '<ul><li></li><li><strong></strong></li></ul><div></div><section class="class"><span>hello</span><div></div><em id="id">world</em></section>');
                 });
 
             });
@@ -229,39 +341,48 @@
 
             });
 
-            it('This is an in-place partial tree re-render, easy on the processor, probably :)', () => {
+            it('This is an in-place partial tree re-render', () => {
 
                 function getRandomColor() {
-                    const letters = '0123456789ABCDEF';
-                    let color = '#';
-                    for (let i = 0; i < 6; i++) {
-                        color += letters[Math.floor(Math.random() * 16)];
-                    }
-                    return color;
+                    return `rgba(${[
+                        Math.random() * 33,
+                        Math.random() * 222,
+                        Math.random() * 255,
+                        1
+                    ].join(',')})`
                 }
 
                 const makeBlock = function () {
-                    return div('', null, {
-                        style: `display: inline-block; height: 10px; width: 10px; background-color: ${getRandomColor()};`
+                    return div({
+                        class: 'block',
+                        style: `transition: all ease 1s;` +
+                            `display: inline-block; height: 10px; width: 10px; background-color: ${getRandomColor()};`
                     });
                 };
 
-                const grid = [1,2,3,4,5,6,7,8,9,0];
+                const grid = [1,2,3,4,5];
 
                 let times = 0;
                 let go = true;
 
                 const component = {
                     element: null,
-                    template: function () {
-                        return this.element = div({
-                            onclick: () => go = !go,
-                            className: 'checkerboard'
-                        }, [
+                    template() {
+                        return this.element = div(
+                            {
+                                click: () => go = !go,
+                                className: 'checkerboard'
+                            },
                             nominate('h6')('', 'This div was regenerated ' + times + ' times with random colors in 1 second'),
                             nominate('h4')('', 'Warning: do not look directly at the HTMLElement'),
-                            grid.map(() => div('', grid.map(makeBlock)))
-                        ])
+                            grid.map(() => div('', grid.map(makeBlock))),
+                            div({ style: 'height: 100px' })
+                        )
+                    },
+                    pulse() {
+                        for (const div of Array.from(this.element.querySelectorAll('.block'))) {
+                            div.style.backgroundColor = getRandomColor();
+                        }
                     }
                 };
 
@@ -276,11 +397,11 @@
 
                 }
 
-                let interval = 16;
+                let interval = 1000;
 
                 setInterval(() => {
                     if (go) {
-                        render(component)
+                        component.pulse();
                     }
                 }, interval);
 
@@ -295,5 +416,7 @@
     });
 </script>
 <script>mocha.run();</script>
+
+</body>
 
 </html>

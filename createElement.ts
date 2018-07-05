@@ -4,22 +4,34 @@
  *
  * The main reason being that the #render(component_t) function also provided here uses both fields
  * to perform a swap in the DOM tree node.
- *
- * @typedef {object} component_t
- * @property {HTMLElement|null} element
- * @method {Function<HTMLElement>} template
  */
+export type component_t = {
+    element: HTMLElement;
+    template(): HTMLElement;
+}
 
+export type nested_t<T> = T|T[]|T[][]|T[][][]|T[][][][];
+
+export type body_t = string|nested_t<HTMLElement>;
+
+/**
+ * This is the returned function type from the #nominate(string) function.
+ */
+export type nominal_creator_t = {
+    (...body: body_t[]): HTMLElement;
+    (className: string, ...body: body_t[]): HTMLElement;
+    (attributes: { [key: string]: any|(() => void) }, ...body: body_t[]): HTMLElement;
+};
 
 /**
  *
  * Creates elements zzz.
  *
- * @param {string} tag - name of the element type.
+ * @param tag - name of the element type.
  * @example div
  *      createElement('div'); // equivalent to document.createElement('div');
  *
- * @param {string} [classNameOrAttributes=''] - css class name or an object of attributes.
+ * @param [classNameOrAttributes] - css class name or an object of attributes.
  * @example class
  *      createElement('div', 'my-css-class');
  * @example attributes
@@ -30,7 +42,7 @@
  *      });
  *
  *
- * @param {string|HTMLElement|HTMLElement[]} [body] - string or elements to form the body.
+ * @param [body] - string or elements to form the body.
  *        This is a rest parameter, and you may provide any of the following:
  *
  * @example one string
@@ -44,9 +56,10 @@
  *      // the nested elements will all be normalized to a flat array of child nodes,
  *      // and falsy values will be ignored.
  *
- * @returns {HTMLElement}
- *
  */
+function createElement(tag: string, ...body: body_t[]): HTMLElement;
+function createElement(tag: string, className: string, ...body: body_t[]): HTMLElement;
+function createElement(tag: string, attributes: { [key: string]: any|(() => void) }, ...body: body_t[]): HTMLElement;
 function createElement(tag, classNameOrAttributes/*, ...body*/) {
 
     var i = 2;
@@ -96,19 +109,16 @@ function createElement(tag, classNameOrAttributes/*, ...body*/) {
 
 /**
  * Redraw in place.
- * @param {component_t} component
  */
-function render(component) {
+function render(component: component_t): void {
     var element = component.element;
     element.parentNode.replaceChild(component.template(), element);
 }
 
 /**
  * @private
- * @param {*} arr - possibly nested array.
- * @returns {*[]}
  */
-function flatten(arr) {
+function flatten(arr: nested_t<HTMLElement>): HTMLElement[] {
 
     if (
         typeof arr !== 'object' ||
@@ -124,14 +134,14 @@ function flatten(arr) {
     var out = [];
 
     var i = 0;
-    for (; i < arr.length; ++i) {
+    for (; i < (<any[]>arr).length; ++i) {
         var item = arr[i];
         if (
             (typeof item === 'object') &&
             ('length' in item) &&
             !('innerHTML' in item)
         ) {
-            Array.prototype.push.apply(out, flatten(item));
+            Array.prototype.push.apply(out, flatten(<any>item));
         } else if (item) {
             out.push(item);
         }
@@ -151,10 +161,8 @@ function flatten(arr) {
  *  ) // returns an HTMLDivElement containing a span.
  *
  * @public
- * @param {string} tag
- * @return {function<HTMLElement>}
  */
-function nominate(tag) {
+function nominate(tag: string): nominal_creator_t {
     return createElement.bind(null, tag);
 }
 
