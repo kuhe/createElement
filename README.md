@@ -133,6 +133,8 @@ const li = nominate('li');
 const ul = nominate('ul');
 const form = nominate('form');
 const input = nominate('input');
+const h = n => nominate('h' + n);
+const button = nominate('button');
 
 /**
  *
@@ -149,15 +151,15 @@ class Todo {
             'add something to my todo list'
         ];
 
-        /**
-         * @type {HTMLElement}
-         */
+        /** @type {HTMLElement} */
+        this.form = null;
+
+        /** @type {HTMLElement} */
         this.input = null;
 
-        /**
-         * @type {HTMLElement}
-         */
+        /** @type {HTMLElement} */
         this.element = null;
+
     }
 
     /**
@@ -166,34 +168,46 @@ class Todo {
     template() {
 
         // This is equivalent to the following HTML:
-        //<div>
-        //    <ul>
-        //        <li>add something to my todo list</li>
-        //    </ul>
-        //    <form>
-        //        <input placeholder="Etner to submit">
-        //    </form>
-        //</div>
+        const html = `
+        <div style="margin: 25px; padding: 15px;">
+            <h5>To Do List</h5>
+            <ul>
+                <li>add something to my todo list</li>
+            </ul>
+            <form>
+                <input placeholder="Enter to submit">
+                <button type="submit">Add</button>
+            </form>
+        </div>
+        `;
 
         return this.element =
             div(
+                { style: 'margin: 25px; padding: 15px;' },
+                h(5)('', 'To Do List'),
                 ul(this.list.map(item => li('', item))),
-                form(this.input = input({
-                    placeholder: 'Enter to submit',
-                    submit: (e) => {
-                        e.preventDefault();
-                        this.list.push(this.input.value);
-                        this.input.value = '';
-                        render(this);
-                    }
-                })
+                this.form = form(
+                    {
+                        submit: (e) => {
+                            e.preventDefault();
+                            this.list.push(this.input.value);
+                            this.input.value = '';
+                            render(this);
+                        }
+                    },
+                    this.input = input({
+                        placeholder: 'Enter to submit'
+                    }),
+                    button({ type: 'submit' }, 'Add')
+                )
             );
 
     }
 
 }
 
-document.body.appendChild(new Todo().template());
+var todo = new Todo();
+document.body.appendChild(todo.template());
 
 ```
 ### Test

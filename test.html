@@ -62,14 +62,18 @@
         template() {
 
             // This is equivalent to the following HTML:
-            //<div>
-            //    <ul>
-            //        <li>add something to my todo list</li>
-            //    </ul>
-            //    <form>
-            //        <input placeholder="Enter to submit">
-            //    </form>
-            //</div>
+            const html = `
+            <div style="margin: 25px; padding: 15px;">
+                <h5>To Do List</h5>
+                <ul>
+                    <li>add something to my todo list</li>
+                </ul>
+                <form>
+                    <input placeholder="Enter to submit">
+                    <button type="submit">Add</button>
+                </form>
+            </div>
+            `;
 
             return this.element =
                 div(
