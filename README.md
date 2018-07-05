@@ -12,8 +12,9 @@ A few principles here:
 For writing out HTML with attached events, the DOM API is so full-featured
 there is no need for a template DSL or front end framework.
 
-It's zero-bandwidth, closer to fast native code, isn't as hard to write as you might expect or have been told,
- and you retain full control of where and how often you rerender your tree.
+Take responsibility for every kilobyte you ship to your users.
+
+The `lib` contains a handful of functions and is measured in bytes (~492 bytes with gzip/minify) rather than kilobytes.
 
 - (1) There's no need for document query selectors.
 
@@ -23,6 +24,13 @@ for your elements to appear on the document. Leave classNames for styling.
 Bind events to elements created in memory, before they are attached to the document. Attach/append to the document
 when you are ready to give an interactive element to the user, not to query or store intermediate application states.
 
+- (2) Components are still the way to go.
+
+This is a rejection of front end frameworks, diff algorithms, even jQuery, but it is not a rejection of
+component-based view architecture.
+
+Even using the `document` API, you can still compose your views by a hierarchy of components.
+
 
 #### Related Information
 
@@ -31,6 +39,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement
 https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
 
 http://youmightnotneedjquery.com/
+
+Similar to: https://github.com/hyperhype/hyperscript
 
 
 #### Import
