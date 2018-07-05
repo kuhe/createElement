@@ -242,7 +242,7 @@ document.body.appendChild(todo.template());
 
 ### Notes
 
-The v1.x call signature of `div('css-class', [...children], { /*attrs*/ }'` has been removed.
+The v1.x call signature of `div('css-class', [...children], { /*attrs*/ })` has been removed.
 
 The v2.x call signature described above is
 
