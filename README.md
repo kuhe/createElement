@@ -40,7 +40,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
 
 http://youmightnotneedjquery.com/
 
-Similar to: https://github.com/hyperhype/hyperscript
+Similar to: https://github.com/hyperhype/hyperscript + https://github.com/ohanhi/hyperscript-helpers
 
 
 #### Import
