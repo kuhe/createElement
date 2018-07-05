@@ -113,11 +113,27 @@ div({}, 'Hello, world'); // no attributes.
 ```
 
 Nest elements
+
 ```js
 div(
     span('a', 'Hello'),
     span('b', 'World')
 );
+```
+
+```js
+form(
+    { submit: () => { ... /* my handler here */ } }
+    div(
+        input({ placeholder: 'username' })
+        input({ placeholder: 'password' })
+        div(
+            input({ type: 'checkbox', checked: '' }),
+            span({}, 'Remember my username')
+        )
+    )
+    button({ type: 'submit' }, 'Login')
+)
 ```
 
 And further on, something with more complexity:
