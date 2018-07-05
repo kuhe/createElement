@@ -239,3 +239,17 @@ document.body.appendChild(todo.template());
 ### Test
 
 `open test.html` in your browser.
+
+### Notes
+
+The v1.x call signature of `div('css-class', [...children], { /*attrs*/ }'` has been removed.
+
+The v2.x call signature described above is
+
+```ts
+div('css-class', ...children);
+// or
+div({ class: 'css-class', ...attrs }, ...children);
+```
+
+Where the child elements can still be arbitrarily nested.
