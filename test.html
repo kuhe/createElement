@@ -14,7 +14,21 @@
 
     <link rel="stylesheet" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/3.5.0/mocha.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/3.5.0/mocha.min.js"></script>
-
+    <style>
+        .block {
+            transition: all 1s ease;
+            height: 10px;
+            width: 10px;
+            margin: 0;
+            padding: 0;
+            display: inline-block;
+            line-height: 10px;
+        }
+        .row {
+            line-height: 10px;
+            height: 10px;
+        }
+    </style>
 </head>
 
 <body>
@@ -29,6 +43,7 @@
     const input = nominate('input');
     const h = n => nominate('h' + n);
     const button = nominate('button');
+    const span = nominate('span');
 
     /**
      *
@@ -104,8 +119,63 @@
     document.body.appendChild(todo.template());
 
 </script>
+<script>
+    function getColor() {
+        return `rgba(${[
+            33,
+            122,
+            155,
+            1
+        ].join(',')})`
+    }
 
-<div id="mocha"><p><a href=".">Index</a></p></div>
+    function makeBlock() {
+        return span({
+            class: 'block',
+            style: `background-color: ${getColor()};`,
+            mouseenter: function () {
+                this.style.backgroundColor = 'white';
+                setTimeout(() => {
+                    this.style.backgroundColor = 'rgba(33,122,155,1)';
+                }, 4000);
+            }
+        });
+    }
+
+    let times = 0;
+    let msg = '';
+    const height = Array.from({ length: 25 });
+    const width = Array.from({ length: 150 });
+
+    const component = {
+        element: null,
+        template() {
+            return this.element = div(
+                {
+                    click: () => {},
+                    className: 'checkerboard'
+                },
+                nominate('h6')('', msg),
+                height.map(() => div('row', width.map(makeBlock)))
+            )
+        }
+    };
+
+    document.body.appendChild(component.template());
+
+    const now = Date.now();
+
+    setTimeout(() => {
+        while (Date.now() - now < 2000) {
+            render(component);
+            times++;
+        }
+        msg = 'This grid was regenerated ' + times + ' times in 1 second';
+        render(component);
+    }, 1000);
+</script>
+
+<div id="mocha"></div>
 <div id="messages"></div>
 <div id="fixtures"></div>
 <script>mocha.setup('bdd')</script>
@@ -115,7 +185,7 @@
         if (otherThing !== undefined) {
             if (whatever !== otherThing) {
                 console.log(whatever, 'not', otherThing);
-                throw new Error(whatever, otherThing);
+                throw new Error(JSON.stringify([whatever, otherThing]));
             }
         }
         if (!whatever) throw new Error(whatever);
@@ -275,6 +345,14 @@
                     yes(el.childNodes[4] instanceof HTMLDivElement);
                 });
 
+                it('div(div(), div({}, `<span>123</span>`))', () => {
+                    const el = div(div(), div({}, `<span>123</span>`));
+                    yes(
+                        el.innerHTML,
+                        `<div></div><div><span>123</span></div>`
+                    )
+                });
+
                 it('complex template', () => {
                     const strong = nominate('strong');
                     const em = nominate('em');
@@ -332,87 +410,21 @@
             it('You can use render to swap an element in place with a new version', () => {
 
                 const component = {
+                    data: 0,
                     element: span('span-class', 'Hello there'),
-                    template: function () { return this.element = div('div-class', 'Hello there'); }
+                    template: function () { return this.element = div('div-class', this.data++); }
                 };
+                div(component.element);
 
-                document.body.appendChild(component.element);
                 yes(component.element instanceof HTMLSpanElement);
+                yes(component.element.innerText, 'Hello there');
                 render(component);
                 yes(component.element instanceof HTMLDivElement);
+                yes(component.element.innerText, '0');
                 render(component);
                 yes(component.element instanceof HTMLDivElement);
+                yes(component.element.innerText, '1');
 
-            });
-
-            it('This is an in-place partial tree re-render', () => {
-
-                function getRandomColor() {
-                    return `rgba(${[
-                        Math.random() * 33,
-                        Math.random() * 222,
-                        Math.random() * 255,
-                        1
-                    ].join(',')})`
-                }
-
-                const makeBlock = function () {
-                    return div({
-                        class: 'block',
-                        style: `transition: all ease 1s;` +
-                            `display: inline-block; height: 10px; width: 10px; background-color: ${getRandomColor()};`
-                    });
-                };
-
-                const grid = [1,2,3,4,5];
-
-                let times = 0;
-                let go = true;
-
-                const component = {
-                    element: null,
-                    template() {
-                        return this.element = div(
-                            {
-                                click: () => go = !go,
-                                className: 'checkerboard'
-                            },
-                            nominate('h6')('', 'This div was regenerated ' + times + ' times with random colors in 1 second'),
-                            nominate('h4')('', 'Warning: do not look directly at the HTMLElement'),
-                            grid.map(() => div('', grid.map(makeBlock))),
-                            div({ style: 'height: 100px' })
-                        )
-                    },
-                    pulse() {
-                        for (const div of Array.from(this.element.querySelectorAll('.block'))) {
-                            div.style.backgroundColor = getRandomColor();
-                        }
-                    }
-                };
-
-                document.body.appendChild(component.template());
-
-                const now = Date.now();
-
-                while (Date.now() - now < 1000) {
-
-                    render(component);
-                    times++;
-
-                }
-
-                let interval = 1000;
-
-                setInterval(() => {
-                    if (go) {
-                        component.pulse();
-                    }
-                }, interval);
-
-            });
-
-            it('though I suppose browser optimization means that was not actually so many redraws', () => {
-                console.log('oh well');
             });
 
         });
@@ -420,6 +432,7 @@
     });
 </script>
 <script>mocha.run();</script>
+<div style="height:100px;"></div>
 
 </body>
 
