@@ -14,9 +14,10 @@
         'div', 'span', 'p',
         'li', 'ul', 'form', 'input', 'h2', 'h3', 'h5',
         'main', 'section', 'button', 'input', 'form',
-        'article', 'strong', 'a', 'code', 'pre', 'dl', 'dt', 'dd'
+        'article', 'strong', 'a', 'code', 'pre', 'dl', 'dt', 'dd',
     ]) {
-        eval(`window.${name} = nominate('${name}');`);
+        const v = name.replace(/-/g, '_');
+        eval(`window.${v} = nominate('${v}');`);
     }
 </script>
 <script src="./out.js"></script>
