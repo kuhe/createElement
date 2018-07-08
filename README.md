@@ -240,6 +240,10 @@ document.body.appendChild(todo.template());
 
 `open test.html` in your browser.
 
+### Curios
+
+An `HTML`-to-`createElement` converter can be found [here](/curiosities/html-converter).
+
 ### Notes
 
 The v1.x call signature of `div('css-class', [...children], { /*attrs*/ })` has been removed.

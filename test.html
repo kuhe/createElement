@@ -412,7 +412,7 @@
                 const component = {
                     data: 0,
                     element: span('span-class', 'Hello there'),
-                    template: function () { return this.element = div('div-class', this.data++); }
+                    template: function () { return this.element = div('div-class', '' + this.data++); }
                 };
                 div(component.element);
 

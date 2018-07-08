@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HTML Converter Test</title>
+    <script src="../../createElement.global.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          crossorigin="anonymous">
+</head>
+<body>
+
+<script>
+    for (const name of [
+        'div', 'span', 'p',
+        'li', 'ul', 'form', 'input', 'h2', 'h3', 'h5',
+        'main', 'section', 'button', 'input', 'form',
+        'article', 'strong', 'a', 'code', 'pre', 'dl', 'dt', 'dd'
+    ]) {
+        eval(`window.${name} = nominate('${name}');`);
+    }
+</script>
+<script src="./out.js"></script>
+<script>
+    document.body.appendChild(element);
+</script>
+</body>
+</html>

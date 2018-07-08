@@ -92,13 +92,14 @@ function createElement(tag, classNameOrAttributes/*, ...body*/) {
         el.setAttribute(k, v);
     }
 
-    if (typeof arguments[i] in { string: 0, number: 0 }) {
-        el.innerHTML = arguments[i];
-    } else {
-        for (; i < arguments.length; ++i) {
-            var children = flatten(arguments[i]);
-            for (var j = 0; j < children.length; ++j) {
-                el.appendChild(children[j]);
+    for (; i < arguments.length; ++i) {
+        var children = flatten(arguments[i]);
+        for (var j = 0; j < children.length; ++j) {
+            var child = children[j];
+            if (typeof child === 'string' || typeof child === 'number') {
+                el.innerHTML += arguments[i];
+            } else {
+                el.appendChild(child);
             }
         }
     }
