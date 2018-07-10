@@ -10,11 +10,18 @@
 <body>
 
 <script>
+    {
+        const tags = {};
+        for (const el of Array.from(document.querySelectorAll('*'))) {
+            tags[el.tagName] = 0;
+        }
+        console.log(Object.keys(tags).map(_ => _.toLowerCase().replace(/-/g, '_')));
+    }
     for (const name of [
         'div', 'span', 'p',
         'li', 'ul', 'form', 'input', 'h2', 'h3', 'h5',
         'main', 'section', 'button', 'input', 'form',
-        'article', 'strong', 'a', 'code', 'pre', 'dl', 'dt', 'dd',
+        'article', 'strong', 'a', 'code', 'pre', 'dl', 'dt', 'dd'
     ]) {
         const v = name.replace(/-/g, '_');
         eval(`window.${v} = nominate('${v}');`);
@@ -22,7 +29,7 @@
 </script>
 <script src="./out.js"></script>
 <script>
-    document.body.appendChild(element);
+    document.body.appendChild(template());
 </script>
 </body>
 </html>
