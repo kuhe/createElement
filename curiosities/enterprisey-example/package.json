@@ -1,0 +1,30 @@
+{
+  "name": "enterprisey-example",
+  "version": "10000.0.8000000",
+  "description": "Enterprisey Example",
+  "main": "src/main.ts",
+  "scripts": {
+    "build": "npx rollup -c",
+    "test": "npx ts-node test/main"
+  },
+  "repository": {
+    "type": "git"
+  },
+  "keywords": [
+    "enterprise",
+    "pain",
+    "suffering"
+  ],
+  "author": "kuhe",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/n/a/issues"
+  },
+  "devDependencies": {
+    "google-closure-compiler": "^20180610.0.2",
+    "node-fetch": "^2.1.2",
+    "rollup": "^0.62.0",
+    "rollup-plugin-typescript2": "^0.15.1",
+    "typescript": "^2.9.2"
+  }
+}

@@ -2,8 +2,9 @@
   "name": "nominal-create-element",
   "version": "2.1.0",
   "description": "",
-  "main": "createElement.cjs.js",
-  "module": "createElement.esm.js",
+  "main": "./createElement.cjs.js",
+  "module": "./createElement.esm.js",
+  "types": "./createElement.d.ts",
   "scripts": {
     "test": "open test.html"
   },
@@ -19,5 +20,8 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
-  "homepage": "https://github.com/kuhe/createElement#readme"
+  "homepage": "https://github.com/kuhe/createElement#readme",
+  "devDependencies": {
+    "jsdom": "^11.11.0"
+  }
 }

@@ -79,7 +79,7 @@ type nominal_creator_t = {
 function nominate(tag: string): nominal_creator_t;
 ```
 
-You can use the provided `render` function if you adhere to a certain component interface.
+You can also use the provided `render` function if you adhere to a certain component interface.
 
 ```ts
 type component_t = {
@@ -93,6 +93,10 @@ function render(component: component_t): void {
 ```
 
 #### examples
+
+"Hold the phone, my friend. I work on a _real_ application. Take me straight to the [enterprisey example](./curiosities/enterprisey-example)."
+
+or, start simple:
 
 ```js
 const div = nominate('div');
@@ -145,8 +149,6 @@ form(
     button({ type: 'submit' }, 'Login')
 )
 ```
-
-And further on, something with more complexity:
 
 A todo list example.
 
@@ -244,16 +246,4 @@ document.body.appendChild(todo.template());
 
 An `HTML`-to-`createElement` converter can be found [here](/curiosities/html-converter).
 
-### Notes
-
-The v1.x call signature of `div('css-class', [...children], { /*attrs*/ })` has been removed.
-
-The v2.x call signature described above is
-
-```ts
-div('css-class', ...children);
-// or
-div({ class: 'css-class', ...attrs }, ...children);
-```
-
-Where the child elements can still be arbitrarily nested.
+An enterprisey example can be found [here](/curiosities/enterprisey-example).
