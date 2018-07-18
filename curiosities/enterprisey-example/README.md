@@ -2,13 +2,13 @@
 
 This application provides a form for querying the OpenWeatherMap api for a given location.
 
-It is provided as one example of how a larger application might be organized.
+It is provided as one example of how a larger application might be organized, featuring typescript and `jsx`.
 
 ```
 
 /src
     /components - renders application data, maintains UI state
-        Application.ts - root component
+        Application.tsx - root component
 
     /sdk - view-agnostic, handles application logic and http api communication
 

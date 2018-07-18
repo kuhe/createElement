@@ -1,4 +1,4 @@
-import {component_t, div} from './renderer';
+import {component_t, createElement} from './renderer';
 import {Search} from './form/search';
 import {Panel} from './search-result/panel';
 
@@ -24,11 +24,11 @@ export class Application implements component_t {
      */
     public template(): HTMLElement {
 
-        return this.element = div(
-            'col-md-4',
-            this.search.template(),
-            this.panel.template()
-        );
+        return this.element =
+            <div class="col-md-4">
+                {this.search.template()}
+                {this.panel.template()}
+            </div>;
 
     }
 
