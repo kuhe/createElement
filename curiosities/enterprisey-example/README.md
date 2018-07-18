@@ -2,7 +2,7 @@
 
 This application provides a form for querying the OpenWeatherMap api for a given location.
 
-It is provided as one example of how a larger application might be organized, featuring typescript and `jsx`.
+It is provided as one example of how a larger application might be organized, featuring typescript, `tsx` (jsx), and unit testing with server side rendering.
 
 ```
 

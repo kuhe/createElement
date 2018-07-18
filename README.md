@@ -94,7 +94,7 @@ function render(component: component_t): void {
 
 #### examples
 
-"Hold the phone, my friend. I work on a _real_ application. Take me straight to the [enterprisey example](./curiosities/enterprisey-example)."
+"Hold the phone, my friend. What about bundlers and `typescript` and `tsx` and component organization? Take me straight to the [enterprisey example](./curiosities/enterprisey-example)."
 
 or, start simple:
 
@@ -246,4 +246,4 @@ document.body.appendChild(todo.template());
 
 An `HTML`-to-`createElement` converter can be found [here](/curiosities/html-converter).
 
-An enterprisey example can be found [here](/curiosities/enterprisey-example).
+An enterprisey example written in `ts/tsx` can be found [here](/curiosities/enterprisey-example).
