@@ -23,6 +23,6 @@ Examples of using the `nominal-create-element` public API:
 
 `nominate (createElement)`: [renderer.ts](https://github.com/kuhe/createElement/blob/master/curiosities/enterprisey-example/src/components/renderer.ts#L11-L20)
 
-`render`: [panel.ts](https://github.com/kuhe/createElement/blob/master/curiosities/enterprisey-example/src/components/search-result/panel.ts#L22)
+`render`: [panel.ts](https://github.com/kuhe/createElement/blob/master/curiosities/enterprisey-example/src/components/search-result/panel.tsx#L22)
 
-`component_t`: [Application.ts](https://github.com/kuhe/createElement/blob/master/curiosities/enterprisey-example/src/components/Application.ts#L14)
+`component_t`: [Application.ts](https://github.com/kuhe/createElement/blob/master/curiosities/enterprisey-example/src/components/Application.tsx#L14)
