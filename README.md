@@ -1,6 +1,28 @@
 # createElement
 
+```js
+// js
+div(
+    { click: () => alert('clack') }
+    span({}, 'hello'),
+    ',',
+    span({}, 'world')
+) 
+// -> native HTMLDivElement
+```
+
+```tsx
+// tsx
+<div click={() => alert('clack')}>
+    <span>hello</span>,
+    <span>world</span>
+</div> 
+// -> native HTMLDivElement
+```
+
 #### What?
+
+Here are a handful of functions that utilize `document.createElement`, `#setAttribute`, `#addEventListener`, and `#replaceChild` to allow a `jsx|tsx` compatible interface for generating native `HTMLElement`s. 
 
 Forgive the unoriginal module name, but this 'script is here to encourage you to use the browser native `document` interface,
 rather than any attempt to brand itself.
@@ -14,7 +36,7 @@ there is no need for a template DSL or front end framework.
 
 Take responsibility for every kilobyte you ship to your users.
 
-The `lib` contains a handful of functions and is measured in bytes (~492 bytes with gzip/minify) rather than kilobytes.
+The `lib` contains a handful of functions and is measured in bytes rather than kilobytes.
 
 - (1) There's no need for document query selectors.
 
@@ -55,6 +77,7 @@ const nominate = createElement.nominate;
 ```
 // ESM style, also available in TypeScript
 import { createElement, nominate, render } from 'nominal-create-element/createElement.esm';
+import { component_t, nominal_creator_t } from 'nominal-create-element/createElement.esm'; // typescript-only types
 ```
 
 #### API
@@ -67,7 +90,13 @@ function createElement(tag: string, className: string, ...body: body_t[]): HTMLE
 function createElement(tag: string, attributes: { [key: string]: any|(() => void) }, ...body: body_t[]): HTMLElement;
 ```
 
-You'll mostly use a partial binding of the `createElement` function with the tag already provided, via the
+If using `tsx` or `jsx`, the `createElement` function serves as the `jsxFactory` via its compatible interface, returning `HTMLElement`s instead of encapsulating classes.
+
+For the `attributes` object, [Element.setAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute) is used for non-functional values, and [EventTarget.addEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) for functional values.
+
+e.g. `{ class: 'my-css', click: () => alert('clack') }`
+
+In regular js/ts, you'll want to use a partial binding of the `createElement` function with the tag already provided, via the
 `nominate(string)` function.
 
 ```ts
@@ -79,7 +108,7 @@ type nominal_creator_t = {
 function nominate(tag: string): nominal_creator_t;
 ```
 
-You can also use the provided `render` function if you adhere to a certain component interface.
+You can also use the provided `render` function if you adhere to the component interface below.
 
 ```ts
 type component_t = {
