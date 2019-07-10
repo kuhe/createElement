@@ -93,7 +93,7 @@ function render(component: component_t): void {
 
 A todo list example.
 
-```js
+```jsx harmony
 
 import { createElement, render } from 'nominal-create-element/createElement.esm';
 
@@ -127,48 +127,34 @@ class Todo {
      * @returns {HTMLElement}
      */
     template() {
-
-        // This is equivalent to the following HTML:
-        const html = `
-        <div style="margin: 25px; padding: 15px;">
-            <h5>To Do List</h5>
-            <ul>
-                <li>add something to my todo list</li>
-            </ul>
-            <form>
-                <input placeholder="Enter to submit">
-                <button type="submit">Add</button>
-            </form>
-        </div>
-        `;
-
         return this.element =
-            div(
-                { style: 'margin: 25px; padding: 15px;' },
-                h(5)('', 'To Do List'),
-                ul(this.list.map(item => li('', item))),
-                this.form = form(
-                    {
-                        submit: (e) => {
-                            e.preventDefault();
-                            this.list.push(this.input.value);
-                            this.input.value = '';
-                            render(this);
+        
+            <div style={'margin: 25px; padding: 15px;'}>
+                <h5>To Do List</h5>
+                <ul>
+                    {this.list.map(item => <li>{item}</li>)}
+                </ul>
+                {
+                    this.form =
+                    <form submit={(e) => {
+                                      e.preventDefault();
+                                      this.list.push(this.input.value);
+                                      this.input.value = '';
+                                      render(this);
+                                  }}>
+                        {
+                            this.input = 
+                            <input placeholder={'Enter to submit'}/>
                         }
-                    },
-                    this.input = input({
-                        placeholder: 'Enter to submit'
-                    }),
-                    button({ type: 'submit' }, 'Add')
-                )
-            );
-
+                        <button type={'submit'}>Add</button>
+                    </form>
+                }
+            </div>
     }
 
 }
 
-var todo = new Todo();
-document.body.appendChild(todo.template());
+document.body.appendChild(new Todo().template());
 
 ```
 ### Test
