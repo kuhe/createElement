@@ -1,7 +1,7 @@
 {
   "name": "nominal-create-element",
-  "version": "2.1.0",
-  "description": "",
+  "version": "2.3.0",
+  "description": "A JSX Factory that outputs HTMLElement directly",
   "main": "./createElement.cjs.js",
   "module": "./createElement.esm.js",
   "types": "./createElement.d.ts",

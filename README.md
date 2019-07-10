@@ -1,16 +1,5 @@
 # createElement
 
-```js
-// js
-div(
-    { click: () => alert('clack') }
-    span({}, 'hello'),
-    ',',
-    span({}, 'world')
-) 
-// -> native HTMLDivElement
-```
-
 ```tsx
 // tsx
 <div click={() => alert('clack')}>
@@ -22,10 +11,12 @@ div(
 
 #### What?
 
+This is a JSXFactory function that outputs `HTMLElement`, having no lifecycle methods nor virtual DOM.
+
 Here are a handful of functions that utilize `document.createElement`, `#setAttribute`, `#addEventListener`, and `#replaceChild` to allow a `jsx|tsx` compatible interface for generating native `HTMLElement`s. 
 
-Forgive the unoriginal module name, but this 'script is here to encourage you to use the browser native `document` interface,
-rather than any attempt to brand itself.
+Similar in principle to [Preact](https://preactjs.com/), this module is here to encourage you to use the most minimal abstraction over the the browser native `document` interface as possible.
+
 
 A few principles here:
 
@@ -38,18 +29,9 @@ Take responsibility for every kilobyte you ship to your users.
 
 The `lib` contains a handful of functions and is measured in bytes rather than kilobytes.
 
-- (1) There's no need for document query selectors.
+- (1) Components are still the way to go.
 
-Avoid the class of errors caused by over or under-binding events, the need to match class/id/tag, or waiting
-for your elements to appear on the document. Leave classNames for styling.
-
-Bind events to elements created in memory, before they are attached to the document. Attach/append to the document
-when you are ready to give an interactive element to the user, not to query or store intermediate application states.
-
-- (2) Components are still the way to go.
-
-This is a rejection of front end frameworks, diff algorithms, even jQuery, but it is not a rejection of
-component-based view architecture.
+Components accurately mirror the tree structure of the `document`, and your data and rendering flow should always keep that structure in mind.
 
 Even using the `document` API, you can still compose your views by a hierarchy of components.
 
@@ -67,48 +49,36 @@ Similar to: https://github.com/hyperhype/hyperscript + https://github.com/ohanhi
 
 #### Import
 
-```js
-// CJS module style
-const createElement = require('nominal-create-element');
-const render = createElement.render;
-const nominate = createElement.nominate;
-```
-
 ```
 // ESM style, also available in TypeScript
-import { createElement, nominate, render } from 'nominal-create-element/createElement.esm';
-import { component_t, nominal_creator_t } from 'nominal-create-element/createElement.esm'; // typescript-only types
+import { createElement, render } from 'nominal-create-element/createElement.esm';
+import { component_t } from 'nominal-create-element/createElement.esm'; // typescript-only types
+
+// in JSX either alias `createElement` to your assumed JSXFactory, 
+// or in TypeScript designate `createElement` as the JSXFactory.
 ```
 
 #### API
 
-Although there is only one source file of 100 lines, here is the API:
+##### createElement
 
-```ts
-function createElement(tag: string, ...body: body_t[]): HTMLElement;
-function createElement(tag: string, className: string, ...body: body_t[]): HTMLElement;
-function createElement(tag: string, attributes: { [key: string]: any|(() => void) }, ...body: body_t[]): HTMLElement;
+```typescript jsx
+// JSX syntax will automatically use `createElement`, which follows the 
+// standard JSXFactory signature.
+<div style={{color: 'black'}} click={() => {}}>
+    Hello, world
+</div>
+// -->
+createElement(
+    'div', 
+    { style: {color: 'black'}, click: () => {} }, 
+    'Hello, world'
+)
 ```
 
-If using `tsx` or `jsx`, the `createElement` function serves as the `jsxFactory` via its compatible interface, returning `HTMLElement`s instead of encapsulating classes.
-
-For the `attributes` object, [Element.setAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute) is used for non-functional values, and [EventTarget.addEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) for functional values.
-
-e.g. `{ class: 'my-css', click: () => alert('clack') }`
-
-In regular js/ts, you'll want to use a partial binding of the `createElement` function with the tag already provided, via the
-`nominate(string)` function.
-
-```ts
-type nominal_creator_t = {
-    (...body: body_t[]): HTMLElement;
-    (className: string, ...body: body_t[]): HTMLElement;
-    (attributes: { [key: string]: any|(() => void) }, ...body: body_t[]): HTMLElement;
-};
-function nominate(tag: string): nominal_creator_t;
-```
-
+##### render
 You can also use the provided `render` function if you adhere to the component interface below.
+Render uses `HTMLElement.replaceChild`.
 
 ```ts
 type component_t = {
@@ -121,77 +91,11 @@ function render(component: component_t): void {
 }
 ```
 
-#### examples
-
-"Hold the phone, my friend. What about bundlers and `typescript` and `tsx` and component organization? Take me straight to the [enterprisey example](./curiosities/enterprisey-example)."
-
-or, start simple:
-
-```js
-const div = nominate('div');
-const span = nominate('span');
-```
-
-Create a simple element.
-
-```js
-div(); // HTMLDivElement
-```
-
-Create an element with a css `class`.
-
-```js
-div('my-css-class');
-```
-
-Create an element with a css `class`, some body text and additional `attributes`.
-
-```js
-div({ id: 'my-css-id', class: 'my-css-class' }, 'my body text');
-```
-
-```js
-div({}, 'Hello, world'); // no attributes.
-
-```
-
-Nest elements
-
-```js
-div(
-    span('a', 'Hello'),
-    span('b', 'World')
-);
-```
-
-```js
-form(
-    { submit: () => { ... /* my handler here */ } }
-    div(
-        input({ placeholder: 'username' })
-        input({ placeholder: 'password' })
-        div(
-            input({ type: 'checkbox', checked: '' }),
-            span({}, 'Remember my username')
-        )
-    )
-    button({ type: 'submit' }, 'Login')
-)
-```
-
 A todo list example.
 
 ```js
 
-import { nominate, render } from 'nominal-create-element/createElement.esm';
-
-const div = nominate('div');
-const li = nominate('li');
-const ul = nominate('ul');
-const form = nominate('form');
-const input = nominate('input');
-const h = n => nominate('h' + n);
-const button = nominate('button');
+import { createElement, render } from 'nominal-create-element/createElement.esm';
 
 /**
  *
@@ -271,8 +175,6 @@ document.body.appendChild(todo.template());
 
 `open test.html` in your browser.
 
-### Curios
+### Example with `TypeScript` + `Rollup`
 
-An `HTML`-to-`createElement` converter can be found [here](/curiosities/html-converter).
-
-An enterprisey example written in `ts/tsx` can be found [here](/curiosities/enterprisey-example).
+Found in `./curiosities/typescript-example`.

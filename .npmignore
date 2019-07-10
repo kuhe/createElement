@@ -1,3 +1,4 @@
 curiosities/enterprisey-example
 .*
 *.log
+node_modules
