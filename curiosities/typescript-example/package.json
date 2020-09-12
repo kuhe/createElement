@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "google-closure-compiler": "^20180610.0.2",
-    "node-fetch": "^2.1.2",
+    "node-fetch": "^2.6.1",
     "rollup": "^0.62.0",
     "rollup-plugin-typescript2": "^0.15.1",
     "typescript": "^2.9.2"
